@@ -1,0 +1,8 @@
+pandas
+openpyxl
+distance
+Pillow
+pdf2image
+numpy
+pyarmor
+pyarmor-runtime

@@ -1,0 +1,6 @@
+pandas
+openpyxl
+distance
+Pillow
+pdf2image
+numpy
