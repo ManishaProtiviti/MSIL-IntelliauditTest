@@ -5,7 +5,7 @@ import DocPreviewModal from "../Modals/DocPreviewModal";
 import downloadIcon from "../../../assets/downloadIcon.svg";
 import reportTableData from "../../utils/reportTableData";
 
-const TransactionalOutcomeTable = ({ tableData, getDocData, docData, handleDowload }) => {
+const TransactionalOutcomeTable = ({ tableData, getDocData, docData, handleDownload }) => {
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
   const [previewFile, setPreviewFile] = useState({
     fileData: "",
@@ -182,7 +182,7 @@ const TransactionalOutcomeTable = ({ tableData, getDocData, docData, handleDowlo
       />
       {/* <MyViewTableModal isOpen={tableModal} onClose={handleTableCloseModal} /> */}
       <div className="mt-2 mr-2 flex justify-end items-center ">
-        <button className="flex flex-row gap-2 justify-between items-center border bg-[#012378] px-4 rounded-lg p-2" onClick={handleDowload}>
+        <button className="flex flex-row gap-2 justify-between items-center border bg-[#012378] px-4 rounded-lg p-2" onClick={handleDownload}>
           <div className="text-xs text-white font-bold">Download</div>
           <img src={downloadIcon} alt="download" width="15" />
         </button>

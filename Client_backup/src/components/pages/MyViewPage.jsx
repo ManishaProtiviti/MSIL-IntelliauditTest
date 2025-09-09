@@ -127,7 +127,7 @@ const MyViewPage = () => {
       console.error("Error fetching reports", error);
     }
   };
-  const handleDowload = async () => {
+  const handleDownload = async () => {
     const pieChartDataUrl = pieChartRef.current?.toBase64Image();
     const barChartDataUrl = barChartRef.current?.toBase64Image();
   
@@ -136,13 +136,28 @@ const MyViewPage = () => {
       return;
     }
   
+    // Convert base64 -> Uint8Array for react-pdf
+    const dataURLtoUint8Array = (dataUrl) => {
+      const base64 = dataUrl.split(",")[1]; // remove prefix
+      const binaryString = window.atob(base64);
+      const len = binaryString.length;
+      const bytes = new Uint8Array(len);
+      for (let i = 0; i < len; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+      }
+      return bytes;
+    };
+  
+    const pieBytes = dataURLtoUint8Array(pieChartDataUrl);
+    const barBytes = dataURLtoUint8Array(barChartDataUrl);
+  
     const blob = await pdf(
       <PdfTemplate
         responseData={responseData}
         userData={userData}
         processingTime={processingTime}
-        pieChartDataUrl={pieChartDataUrl}
-        barChartDataUrl={barChartDataUrl}
+        pieChartDataUrl={pieBytes}
+        barChartDataUrl={barBytes}
       />
     ).toBlob();
   
@@ -258,7 +273,7 @@ const MyViewPage = () => {
                 tableData={responseData?.transactions}
                 getDocData={getDocData}
                 docData={docData}
-                handleDowload={handleDowload}
+                handleDownload={handleDownload}
               />
             </div>
           </div>
