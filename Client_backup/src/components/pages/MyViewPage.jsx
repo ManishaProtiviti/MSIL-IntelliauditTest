@@ -128,41 +128,27 @@ const MyViewPage = () => {
     }
   };
   const handleDownload = async () => {
-    const pieChartDataUrl = pieChartRef.current?.toBase64Image();
-    const barChartDataUrl = barChartRef.current?.toBase64Image();
+    const pieChartDataUrl = pieChartRef.current?.toBase64Image("image/png", 1);
+    const barChartDataUrl = barChartRef.current?.toBase64Image("image/png", 1);
   
     if (!pieChartDataUrl || !barChartDataUrl) {
-      console.error("Charts not ready yet!");
+      alert("Charts not ready yet!");
       return;
     }
-  
-    // Convert base64 -> Uint8Array for react-pdf
-    const dataURLtoUint8Array = (dataUrl) => {
-      const base64 = dataUrl.split(",")[1]; // remove prefix
-      const binaryString = window.atob(base64);
-      const len = binaryString.length;
-      const bytes = new Uint8Array(len);
-      for (let i = 0; i < len; i++) {
-        bytes[i] = binaryString.charCodeAt(i);
-      }
-      return bytes;
-    };
-  
-    const pieBytes = dataURLtoUint8Array(pieChartDataUrl);
-    const barBytes = dataURLtoUint8Array(barChartDataUrl);
   
     const blob = await pdf(
       <PdfTemplate
         responseData={responseData}
         userData={userData}
         processingTime={processingTime}
-        pieChartDataUrl={pieBytes}
-        barChartDataUrl={barBytes}
+        pieChartDataUrl={pieChartDataUrl}
+        barChartDataUrl={barChartDataUrl}
       />
     ).toBlob();
   
-    saveAs(blob, `report-${new Date().toISOString()}.pdf`);
+    saveAs(blob, "report.pdf");
   };
+  
   
   return (
     <div className="bg-[#f3f3f3] min-h-screen w-full">

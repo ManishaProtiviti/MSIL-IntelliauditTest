@@ -1,4 +1,3 @@
-// utils/PdfTemplate.jsx
 import React from "react";
 import {
   Document,
@@ -10,12 +9,14 @@ import {
   Image,
 } from "@react-pdf/renderer";
 
-// Register a font (optional)
+// Register Roboto font
 Font.register({
   family: "Roboto",
-  // fonts: [
-  //   { src: "https://fonts.gstatic.com/s/roboto/v29/KFOmCnqEu92Fr1Mu4mxM.woff2" },
-  // ],
+  fonts: [
+    {
+      src: "https://fonts.gstatic.com/s/roboto/v29/KFOmCnqEu92Fr1Mu4mxM.woff2",
+    },
+  ],
 });
 
 // Styles
@@ -67,11 +68,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  chartImage: {
-    width: "100%",
-    height: "100%",
-    objectFit: "contain",
-  },
   table: {
     width: "100%",
     border: "1 solid #000",
@@ -107,7 +103,13 @@ const renderCheck = (val) => {
   return "-";
 };
 
-const PdfTemplate = ({ responseData, userData, processingTime, pieChartDataUrl, barChartDataUrl }) => {
+const PdfTemplate = ({
+  responseData,
+  userData,
+  processingTime,
+  pieChartDataUrl,
+  barChartDataUrl,
+}) => {
   const transactions = responseData?.transactions || [];
   const status = responseData?.status_data?.[0] || {};
 
@@ -119,7 +121,9 @@ const PdfTemplate = ({ responseData, userData, processingTime, pieChartDataUrl, 
           <Text style={styles.logo}>MARUTI SUZUKI</Text>
           <View style={styles.userInfo}>
             <Text>{userData?.name}</Text>
-            <Text>#{userData?.employeeId} – {userData?.email}</Text>
+            <Text>
+              #{userData?.employeeId} – {userData?.email}
+            </Text>
             <Text>Department: {userData?.department || "DX3"}</Text>
             <Text>Access: {userData?.access || "Enterprise"}</Text>
           </View>
@@ -143,8 +147,14 @@ const PdfTemplate = ({ responseData, userData, processingTime, pieChartDataUrl, 
 
         {/* Timestamps */}
         <View style={{ marginTop: 10, fontSize: 8 }}>
-          <Text>Login Time Stamp: {status?.Login_Timestamp || "DD-MM-YYYY HH:MM:SS"}</Text>
-          <Text>Execution Time Stamp: {status?.Process_End_Time || "DD-MM-YYYY HH:MM:SS"}</Text>
+          <Text>
+            Login Time Stamp:{" "}
+            {status?.Login_Timestamp || "DD-MM-YYYY HH:MM:SS"}
+          </Text>
+          <Text>
+            Execution Time Stamp:{" "}
+            {status?.Process_End_Time || "DD-MM-YYYY HH:MM:SS"}
+          </Text>
           <Text>Process Duration: {processingTime || "XX Min/Sec"}</Text>
         </View>
 
@@ -153,14 +163,14 @@ const PdfTemplate = ({ responseData, userData, processingTime, pieChartDataUrl, 
         <View style={styles.outcomeRow}>
           <View style={styles.chartBox}>
             {pieChartDataUrl ? (
-              <Image src={pieChartDataUrl} style={styles.chartImage} />
+              <Image src={pieChartDataUrl} style={{ width: "100%", height: "100%" }} />
             ) : (
               <Text>No Pie Chart Available</Text>
             )}
           </View>
           <View style={styles.chartBox}>
             {barChartDataUrl ? (
-              <Image src={barChartDataUrl} style={styles.chartImage} />
+              <Image src={barChartDataUrl} style={{ width: "100%", height: "100%" }} />
             ) : (
               <Text>No Bar Chart Available</Text>
             )}
@@ -171,30 +181,54 @@ const PdfTemplate = ({ responseData, userData, processingTime, pieChartDataUrl, 
         <Text style={styles.sectionTitle}>Transactional outcome</Text>
         <View style={styles.table}>
           <View style={styles.tableRow}>
-            <Text style={[styles.tableCol, styles.tableHeader, { flex: 0.5 }]}>S.No</Text>
+            <Text style={[styles.tableCol, styles.tableHeader, { flex: 0.5 }]}>
+              S.No
+            </Text>
             <Text style={[styles.tableCol, styles.tableHeader]}>File Name</Text>
-            <Text style={[styles.tableCol, styles.tableHeader]}>Checks Failed</Text>
-            <Text style={[styles.tableCol, styles.tableHeader]}>De-Duplication</Text>
+            <Text style={[styles.tableCol, styles.tableHeader]}>
+              Checks Failed
+            </Text>
+            <Text style={[styles.tableCol, styles.tableHeader]}>
+              De-Duplication
+            </Text>
             <Text style={[styles.tableCol, styles.tableHeader]}>PDF Edit</Text>
             <Text style={[styles.tableCol, styles.tableHeader]}>Copy Move</Text>
             <Text style={[styles.tableCol, styles.tableHeader]}>Metadata</Text>
             <Text style={[styles.tableCol, styles.tableHeader]}>QR Code</Text>
-            <Text style={[styles.tableCol, styles.tableHeader]}>Image Edit</Text>
+            <Text style={[styles.tableCol, styles.tableHeader]}>
+              Image Edit
+            </Text>
           </View>
 
           {transactions.map((row, i) => {
-            const checksFailed = Object.values(row).filter((val) => val === "Yes").length;
+            const checksFailed = Object.values(row).filter(
+              (val) => val === "Yes"
+            ).length;
             return (
               <View key={i} style={styles.tableRow}>
                 <Text style={[styles.tableCol, { flex: 0.5 }]}>{i + 1}</Text>
-                <Text style={styles.tableCol}>{row?.Document_Name || "-"}</Text>
+                <Text style={styles.tableCol}>
+                  {row?.Document_Name || "-"}
+                </Text>
                 <Text style={styles.tableCol}>{checksFailed}/5</Text>
-                <Text style={styles.tableCol}>{renderCheck(row?.Duplicate_Exception_Flag)}</Text>
-                <Text style={styles.tableCol}>{renderCheck(row?.PDF_Edit_Exception_Flag)}</Text>
-                <Text style={styles.tableCol}>{renderCheck(row?.Copy_Move_Exception_Flag)}</Text>
-                <Text style={styles.tableCol}>{renderCheck(row?.MetaData_Exception_Flag)}</Text>
-                <Text style={styles.tableCol}>{renderCheck(row?.QR_Code_Exception_Flag)}</Text>
-                <Text style={styles.tableCol}>{renderCheck(row?.Image_Edit_Exception_Flag)}</Text>
+                <Text style={styles.tableCol}>
+                  {renderCheck(row?.Duplicate_Exception_Flag)}
+                </Text>
+                <Text style={styles.tableCol}>
+                  {renderCheck(row?.PDF_Edit_Exception_Flag)}
+                </Text>
+                <Text style={styles.tableCol}>
+                  {renderCheck(row?.Copy_Move_Exception_Flag)}
+                </Text>
+                <Text style={styles.tableCol}>
+                  {renderCheck(row?.MetaData_Exception_Flag)}
+                </Text>
+                <Text style={styles.tableCol}>
+                  {renderCheck(row?.QR_Code_Exception_Flag)}
+                </Text>
+                <Text style={styles.tableCol}>
+                  {renderCheck(row?.Image_Edit_Exception_Flag)}
+                </Text>
               </View>
             );
           })}
