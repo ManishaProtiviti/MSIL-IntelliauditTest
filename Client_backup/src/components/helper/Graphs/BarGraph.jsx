@@ -1,6 +1,6 @@
+import React, { forwardRef, useRef, useImperativeHandle, useEffect, useState } from "react";
 import { Bar } from "react-chartjs-2";
 import ChartDataLabels from "chartjs-plugin-datalabels";
-import { forwardRef, useEffect, useState, useImperativeHandle, useRef } from "react";
 import {
   Chart as ChartJS,
   Tooltip,
@@ -18,22 +18,15 @@ const BarGraph = forwardRef(({ data }, ref) => {
   const chartRef = useRef();
 
   useEffect(() => {
-    countYesPerKey(data);
-  }, [data]);
-
-  const countYesPerKey = (data) => {
     const yesCount = {};
     data?.forEach((obj) => {
-      Object.keys(obj).forEach((key) => {
-        if (obj[key] === "Yes") {
-          yesCount[key] = (yesCount[key] || 0) + 1;
-        } else if (!yesCount[key]) {
-          yesCount[key] = 0;
-        }
+      Object.keys(obj || {}).forEach((key) => {
+        if (obj[key] === "Yes") yesCount[key] = (yesCount[key] || 0) + 1;
+        else yesCount[key] = yesCount[key] || 0;
       });
     });
     setFailureCountObj(yesCount);
-  };
+  }, [data]);
 
   const checkFailureData = {
     labels: ["De-Duplication", "PDF Edit", "Copy Move", "Metadata", "QR Code", "Image Edit"],
@@ -59,28 +52,23 @@ const BarGraph = forwardRef(({ data }, ref) => {
     responsive: true,
     plugins: {
       legend: { display: false },
-      datalabels: {
-        display: true,
-        color: "#fff",
-        anchor: "center",
-        align: "center",
-        font: { weight: "bold", size: 10 },
-        formatter: (value) => value,
-      },
+      datalabels: { display: true, anchor: "center", align: "center", color: "#fff", font: { weight: "bold", size: 10 } },
     },
     scales: {
       y: { beginAtZero: true, ticks: { display: false }, grid: { display: false } },
-      x: {
-        ticks: { color: "#000", font: { size: 8 }, autoSkip: false },
-        grid: { display: false },
-      },
+      x: { ticks: { autoSkip: false, maxRotation: 0, minRotation: 0 }, grid: { display: false } },
     },
   };
 
-  // Expose chart instance
   useImperativeHandle(ref, () => ({
-    getChart: () => chartRef.current,
-    toBase64Image: () => chartRef.current?.toBase64Image(),
+    toBase64Image: () => {
+      try {
+        return chartRef.current?.toBase64Image?.() || null;
+      } catch (e) {
+        return null;
+      }
+    },
+    getChartInstance: () => chartRef.current || null,
   }));
 
   return (

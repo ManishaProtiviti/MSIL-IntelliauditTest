@@ -127,26 +127,58 @@ const MyViewPage = () => {
       console.error("Error fetching reports", error);
     }
   };
-  const handleDownload = async () => {
-    const pieChartDataUrl = pieChartRef.current?.toBase64Image("image/png", 1);
-    const barChartDataUrl = barChartRef.current?.toBase64Image("image/png", 1);
-  
-    if (!pieChartDataUrl || !barChartDataUrl) {
-      alert("Charts not ready yet!");
-      return;
+  // robust getter: tries chartRef.toBase64Image(), then chart.canvas.toDataURL(), retries a few times
+  const getChartDataUrl = async (chartRef, attempts = 8, delay = 200) => {
+    for (let i = 0; i < attempts; i++) {
+      try {
+        // 1) try the exposed toBase64Image()
+        const maybe = chartRef.current?.toBase64Image?.();
+        if (maybe && typeof maybe === "string" && maybe.startsWith("data:image/")) {
+          return maybe;
+        }
+
+        // 2) try Chart.js instance's canvas
+        const chartInstance = chartRef.current?.getChartInstance?.() || chartRef.current;
+        const canvas = chartInstance?.canvas || chartInstance?.ctx?.canvas || chartRef.current?.canvas;
+        if (canvas && typeof canvas.toDataURL === "function") {
+          const url = canvas.toDataURL("image/png");
+          if (url && url.startsWith("data:image/")) return url;
+        }
+      } catch (e) {
+        // ignore and retry
+      }
+      // wait a bit and retry
+      await new Promise((r) => setTimeout(r, delay));
     }
-  
-    const blob = await pdf(
-      <PdfTemplate
-        responseData={responseData}
-        userData={userData}
-        processingTime={processingTime}
-        pieChartDataUrl={pieChartDataUrl}
-        barChartDataUrl={barChartDataUrl}
-      />
-    ).toBlob();
-  
-    saveAs(blob, "report.pdf");
+    return null;
+  };
+
+  const handleDowload = async () => {
+    try {
+      const pieChartDataUrl = await getChartDataUrl(pieChartRef, 10, 200);
+      const barChartDataUrl = await getChartDataUrl(barChartRef, 10, 200);
+
+      if (!pieChartDataUrl || !barChartDataUrl) {
+        // generate PDF but without charts (safe fallback)
+        console.warn("Could not capture charts in time — generating PDF without charts.");
+      }
+
+      // IMPORTANT: pass the data URLs directly (react-pdf expects 'data:image/...' string)
+      const blob = await pdf(
+        <PdfTemplate
+          responseData={responseData}
+          userData={userData}
+          processingTime={processingTime}
+          pieChartDataUrl={pieChartDataUrl}
+          barChartDataUrl={barChartDataUrl}
+        />
+      ).toBlob();
+
+      saveAs(blob, `report-${new Date().toISOString()}.pdf`);
+    } catch (err) {
+      console.error("PDF generation failed:", err);
+      alert("PDF generation failed. Check console for details.");
+    }
   };
   
   

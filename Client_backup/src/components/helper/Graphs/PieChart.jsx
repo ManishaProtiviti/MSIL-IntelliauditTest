@@ -1,5 +1,5 @@
+import React, { forwardRef, useRef, useImperativeHandle } from "react";
 import { Pie } from "react-chartjs-2";
-import { forwardRef, useImperativeHandle } from "react";
 import ChartDataLabels from "chartjs-plugin-datalabels";
 import {
   Chart as ChartJS,
@@ -11,10 +11,13 @@ import {
 ChartJS.register(ArcElement, Tooltip, Legend, ChartDataLabels);
 
 const PieChart = forwardRef(({ data }, ref) => {
-  const totalDocs = data && data.length;
+  const chartRef = useRef();
+
+  const totalDocs = data?.length || 0;
   const failedDocs =
-    data?.filter((item) => Object.values(item).some((value) => value === "Yes"))
-      .length || 0;
+    data?.filter((item) =>
+      Object.values(item).some((value) => value === "Yes")
+    )?.length || 0;
   const passedDocs = totalDocs - failedDocs;
 
   const pieData = {
@@ -32,40 +35,33 @@ const PieChart = forwardRef(({ data }, ref) => {
     maintainAspectRatio: false,
     responsive: true,
     plugins: {
-      legend: {
-        display: true,
-        position: "right",
-      },
+      legend: { display: true, position: "right" },
       datalabels: {
         formatter: (value, context) => {
-          const total = context.chart.data.datasets[0].data.reduce(
-            (sum, val) => sum + val,
-            0
-          );
-          const percentage = ((value / total) * 100).toFixed(0);
-          const label = context.chart.data.labels[context.dataIndex];
-          return `${label}: ${value} (${percentage}%)`;
+          const total = context.chart.data.datasets[0].data.reduce((s, v) => s + v, 0);
+          const pct = total ? Math.round((value / total) * 100) : 0;
+          return `${value} (${pct}%)`;
         },
         color: "#fff",
         font: { weight: "bold", size: 10 },
       },
-      title: {
-        display: true,
-        text: "Pass / Fail Split",
-        align: "start",
-        color: "#000",
-        font: { size: 12, weight: "bold" },
-      },
+      title: { display: true, text: "Pass / Fail Split", align: "start" },
     },
   };
 
-  // Expose Chart.js instance to parent
+  // expose toBase64Image() to parent
   useImperativeHandle(ref, () => ({
-    getChart: () => chartRef.current,
-    toBase64Image: () => chartRef.current?.toBase64Image(),
+    toBase64Image: () => {
+      try {
+        // chartRef.current is Chart.js instance provided by react-chartjs-2
+        return chartRef.current?.toBase64Image?.() || null;
+      } catch (e) {
+        // fallback later (canvas read) will be used by parent
+        return null;
+      }
+    },
+    getChartInstance: () => chartRef.current || null,
   }));
-
-  const chartRef = React.useRef();
 
   return (
     <div className="bg-white rounded-xl shadow-md w-full">
