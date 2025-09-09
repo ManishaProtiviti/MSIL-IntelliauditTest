@@ -29,6 +29,7 @@ const MyViewPage = () => {
   const barChartRef = useRef(null);
   const uploadTimeParam = sessionStorage.getItem("uploadTime");
   const VITE_API_URL = import.meta.env.VITE_API_URL;
+  const [pdfUrl, setPdfUrl] = useState(null);
 
   useEffect(() => {
     // Fetch reports
@@ -180,8 +181,22 @@ const MyViewPage = () => {
       alert("PDF generation failed. Check console for details.");
     }
   };
-  
-  
+  const handlePreview = async () => {
+    const blob = await pdf(
+      <PdfTemplate
+        responseData={responseData}
+        userData={userData}
+        processingTime={processingTime}
+        pieChartDataUrl={pieChartDataUrl}
+        barChartDataUrl={barChartDataUrl}
+      />
+    ).toBlob();
+
+    const url = URL.createObjectURL(blob);
+    setPdfUrl(url);
+  };
+
+
   return (
     <div className="bg-[#f3f3f3] min-h-screen w-full">
       <div className="grid grid-cols-1 lg:grid-cols-12 min-h-screen">
@@ -272,10 +287,10 @@ const MyViewPage = () => {
                   <div className="text-xs font-medium bg-[#012378] text-white px-2 py-1 rounded">
                     {responseData?.status_data?.length
                       ? `${(
-                          parseFloat(
-                            responseData?.status_data[0]?.Total_Size_Upload
-                          ) || 0
-                        ).toFixed(2)} MB`
+                        parseFloat(
+                          responseData?.status_data[0]?.Total_Size_Upload
+                        ) || 0
+                      ).toFixed(2)} MB`
                       : "0.00 MB"}
                   </div>
                 </div>
@@ -293,6 +308,10 @@ const MyViewPage = () => {
                 docData={docData}
                 handleDownload={handleDownload}
               />
+              <button onClick={handlePreview}>Preview PDF</button>
+              {pdfUrl && (
+                <iframe src={pdfUrl} width="100%" height="600px" title="PDF Preview" />
+              )}
             </div>
           </div>
 
