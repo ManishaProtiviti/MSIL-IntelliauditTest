@@ -8,9 +8,9 @@ import intelliAuditLogofrom from "../../assets/intelliAudit-logo.svg";
 const api_url = import.meta.env.VITE_API_URL;
 const API_KEY = "7O6pIW7s4x9lChH4lPXdT9unhrMfe1513OetVQmL";
 // const CLIENT_ID = "4patfko8kccn3nquplovu6008k";
-//const CLIENT_ID = "3s2ompa7a888fvl94kvm581vvj";
-const CLIENT_ID = "5miscbmfvmhp49mmdlekvumsst";
-const REDIRECT_URI = "http://localhost:5173/home";
+const CLIENT_ID = "3s2ompa7a888fvl94kvm581vvj";
+//const CLIENT_ID = "5miscbmfvmhp49mmdlekvumsst";
+const REDIRECT_URI = "https://devintelliaudit.maruti-suzuki.ai/home";
 
 const LandingPage = () => {
   const [status, setStatus] = useState("");

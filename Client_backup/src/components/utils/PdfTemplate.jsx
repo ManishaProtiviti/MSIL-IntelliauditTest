@@ -13,9 +13,9 @@ import {
 // Register a font (optional)
 Font.register({
   family: "Roboto",
-  fonts: [
-    { src: "https://fonts.gstatic.com/s/roboto/v29/KFOmCnqEu92Fr1Mu4mxM.woff2" },
-  ],
+  // fonts: [
+  //   { src: "https://fonts.gstatic.com/s/roboto/v29/KFOmCnqEu92Fr1Mu4mxM.woff2" },
+  // ],
 });
 
 // Styles
@@ -107,7 +107,7 @@ const renderCheck = (val) => {
   return "-";
 };
 
-const PdfTemplate = ({ responseData, userData, processingTime, pieChartImg, barChartImg }) => {
+const PdfTemplate = ({ responseData, userData, processingTime, pieChartDataUrl, barChartDataUrl }) => {
   const transactions = responseData?.transactions || [];
   const status = responseData?.status_data?.[0] || {};
 
@@ -152,15 +152,15 @@ const PdfTemplate = ({ responseData, userData, processingTime, pieChartImg, barC
         <Text style={styles.sectionTitle}>Outcome overview</Text>
         <View style={styles.outcomeRow}>
           <View style={styles.chartBox}>
-            {pieChartImg ? (
-              <Image src={pieChartImg} style={styles.chartImage} />
+            {pieChartDataUrl ? (
+              <Image src={pieChartDataUrl} style={styles.chartImage} />
             ) : (
               <Text>No Pie Chart Available</Text>
             )}
           </View>
           <View style={styles.chartBox}>
-            {barChartImg ? (
-              <Image src={barChartImg} style={styles.chartImage} />
+            {barChartDataUrl ? (
+              <Image src={barChartDataUrl} style={styles.chartImage} />
             ) : (
               <Text>No Bar Chart Available</Text>
             )}

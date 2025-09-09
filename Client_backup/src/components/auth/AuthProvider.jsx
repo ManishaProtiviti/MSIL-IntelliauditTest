@@ -7,10 +7,10 @@ import { convertTimestampToNormal } from "../utils/timeStampFormatter";
 const AuthContext = createContext();
 const api_url = import.meta.env.VITE_API_URL;
 const API_KEY = "7O6pIW7s4x9lChH4lPXdT9unhrMfe1513OetVQmL";
-//const CLIENT_ID = "3s2ompa7a888fvl94kvm581vvj";
-const CLIENT_ID = "5miscbmfvmhp49mmdlekvumsst";
+const CLIENT_ID = "3s2ompa7a888fvl94kvm581vvj";
+//const CLIENT_ID = "5miscbmfvmhp49mmdlekvumsst";
 // const REDIRECT_URI = `${api_url}/home`;
-const REDIRECT_URI = "http://localhost:5173/home";
+const REDIRECT_URI = "https://devintelliaudit.maruti-suzuki.ai/home";
 
 
 export const AuthProvider = ({ children }) => {
@@ -112,6 +112,41 @@ export const AuthProvider = ({ children }) => {
           throw new Error("No token received in response");
         }
 
+        // const res1 = await axios.get(
+        //   "https://apipreprod.developersinmarutisuzuki.in/partnermgt/v1/common/PartnerManagement/partner/cognito/verify-token",
+        //   // {
+        //   //   // redirectUrl: REDIRECT_URI,
+        //   //   code,
+        //   //   clientId: CLIENT_ID,
+        //   // },
+        //   {
+        //     headers: {
+        //       "Content-Type": "application/json",
+        //       "x-api-key": API_KEY,
+        //       "Authorization": token
+        //     },
+        //     timeout: 15000,
+        //   }
+        // );
+        // console.log(res1, "Response for verficatin");
+        // const res2 = await axios.post(
+        //   "https://apipreprod.developersinmarutisuzuki.in/dealerauth/v1/common/DealerAuthentication/partner/refresh-token",
+        //   {
+        //     // redirectUrl: REDIRECT_URI,
+        //     // code,
+        //     clientId: CLIENT_ID,
+        //     refreshToken: res?.data?.data?.RefreshToken
+        //   },
+        //   {
+        //     headers: {
+        //       "Content-Type": "application/json",
+        //       "x-api-key": API_KEY,
+        //       // "Authorization": token+ "gg"
+        //     },
+        //     timeout: 15000,
+        //   }
+        // );
+        // console.log(res2, "Response for refresh");
         const decoded = jwtDecode(token);
         console.log("Decoded JWT:", decoded);
 

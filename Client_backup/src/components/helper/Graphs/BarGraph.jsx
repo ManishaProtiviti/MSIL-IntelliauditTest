@@ -1,5 +1,6 @@
 import { Bar } from "react-chartjs-2";
 import ChartDataLabels from "chartjs-plugin-datalabels";
+import { forwardRef } from "react";
 import {
   Chart as ChartJS,
   ArcElement,
@@ -23,7 +24,7 @@ ChartJS.register(
   ChartDataLabels
 );
 
-const BarGraph = ({ data }) => {
+const BarGraph = forwardRef(({ data }, ref) => {
   const [failureCountObj, setFailureCountObj] = useState({});
   console.log(data, "DATA x");
   useEffect(() => {
@@ -148,9 +149,9 @@ const BarGraph = ({ data }) => {
       <h2 className="text-xs font-bold text-[#000] py-2 pl-2">
         Check Wise Files Failed
       </h2>
-      <Bar data={checkFailureData} options={checkFailureOptions} />
+      <Bar ref={ref} data={checkFailureData} options={checkFailureOptions} />
     </div>
   );
-};
+});
 
 export default BarGraph;

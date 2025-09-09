@@ -5,7 +5,7 @@ import PieChart from "../helper/Graphs/PieChart";
 import TransactionalOutcomeTable from "../helper/Tables/TransactionalOutcomeTable";
 import BarChart from "../helper/Graphs/BarChart";
 import axios from "axios";
-import { useDebugValue, useEffect, useState } from "react";
+import { useDebugValue, useEffect, useRef, useState } from "react";
 import {
   convertTimestampToNormal,
   convertTimestampToNormalWithoutMS,
@@ -25,6 +25,8 @@ const MyViewPage = () => {
   const userData = JSON.parse(sessionStorage.getItem("session"));
   const [selectedReport, setSelectedReport] = useState(null);
   const [rowNumber, setRowNumber] = useState(1);
+  const pieChartRef = useRef(null);
+  const barChartRef = useRef(null);
   const uploadTimeParam = sessionStorage.getItem("uploadTime");
   const VITE_API_URL = import.meta.env.VITE_API_URL;
 
@@ -126,7 +128,13 @@ const MyViewPage = () => {
     }
   };
   const handleDowload = async () => {
-    const blob = await pdf(<PdfTemplate/>).toBlob();
+    const pieChartDataUrl = pieChartRef.current?.toBase64Image();
+    const barChartDataUrl = barChartRef.current?.toBase64Image();
+
+    if (!pieChartDataUrl || !barChartDataUrl){
+      console.error('Charts not ready yet!');
+    }
+    const blob = await pdf(<PdfTemplate responseData={responseData} userData={userData} processingTime={processingTime} pieChartDataUrl={pieChartDataUrl} barChartDataUrl={barChartDataUrl}/>).toBlob();
 
     // Save the PDF file
     saveAs(blob, `report-${new Date().toISOString()}.pdf`);
@@ -154,8 +162,8 @@ const MyViewPage = () => {
                 Session Outcome
               </h2>
 
-              <PieChart data={responseData?.transactions} />
-              <BarGraph data={responseData?.transactions} />
+              <PieChart ref={pieChartRef} data={responseData?.transactions} />
+              <BarGraph ref={barChartRef} data={responseData?.transactions} />
               <div className="relative bg-white rounded-md shadow-sm py-2">
                 <div className="flex items-center gap-2 pb-2">
                   <span className="border-2 border-[#012378] rounded-md h-7"></span>

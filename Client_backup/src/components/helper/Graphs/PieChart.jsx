@@ -1,4 +1,5 @@
 import { Pie } from "react-chartjs-2";
+import { forwardRef } from "react";
 import ChartDataLabels from "chartjs-plugin-datalabels";
 import {
   Chart as ChartJS,
@@ -23,7 +24,7 @@ ChartJS.register(
   ChartDataLabels
 );
 
-const PieChart = ({ data }) => {
+const PieChart = forwardRef(({ data }, ref) => {
   const totalDocs = data && data.length;
   const failedDocs =
     data?.filter((item) => Object.values(item).some((value) => value === "Yes"))
@@ -119,7 +120,7 @@ const PieChart = ({ data }) => {
       <div className="flex flex-col md:flex-row items-center justify-between gap-4 p-2">
         {/* Chart Wrapper for responsiveness */}
         <div className="w-full h-64">
-          <Pie data={pieData} options={pieOptions} />
+          <Pie ref={ref} data={pieData} options={pieOptions} />
         </div>
 
         {/* Right-side Bar (optional) */}
@@ -133,6 +134,6 @@ const PieChart = ({ data }) => {
       </div>
     </div>
   );
-};
+});
 
 export default PieChart;

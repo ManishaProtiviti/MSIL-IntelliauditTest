@@ -13,10 +13,10 @@ import UploadMessageModal from "../helper/Modals/UploadMessageModal";
 import { useAuth } from "../auth/AuthProvider";
 const api_url = import.meta.env.VITE_API_URL;
 const API_KEY = "7O6pIW7s4x9lChH4lPXdT9unhrMfe1513OetVQmL";
-const CLIENT_ID = "5miscbmfvmhp49mmdlekvumsst";
+//const CLIENT_ID = "5miscbmfvmhp49mmdlekvumsst";
 // const CLIENT_ID = "4patfko8kccn3nquplovu6008k";
-//const CLIENT_ID = "3s2ompa7a888fvl94kvm581vvj";
-const REDIRECT_URI = "https://devIntelliAudit.maruti-suzuki.ai/home";
+const CLIENT_ID = "3s2ompa7a888fvl94kvm581vvj";
+const REDIRECT_URI = "https://devintelliaudit.maruti-suzuki.ai/home";
 //const REDIRECT_URI = "http://localhost:5173/home";
 
 const HomePage = () => {
