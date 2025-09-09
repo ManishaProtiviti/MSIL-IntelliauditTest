@@ -1,9 +1,8 @@
 import { Bar } from "react-chartjs-2";
 import ChartDataLabels from "chartjs-plugin-datalabels";
-import { forwardRef } from "react";
+import { forwardRef, useEffect, useState, useImperativeHandle, useRef } from "react";
 import {
   Chart as ChartJS,
-  ArcElement,
   Tooltip,
   Legend,
   CategoryScale,
@@ -11,61 +10,33 @@ import {
   BarElement,
   Title,
 } from "chart.js";
-import { useEffect, useState } from "react";
 
-ChartJS.register(
-  ArcElement,
-  Tooltip,
-  Legend,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  ChartDataLabels
-);
+ChartJS.register(Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title, ChartDataLabels);
 
 const BarGraph = forwardRef(({ data }, ref) => {
   const [failureCountObj, setFailureCountObj] = useState({});
-  console.log(data, "DATA x");
+  const chartRef = useRef();
+
   useEffect(() => {
     countYesPerKey(data);
   }, [data]);
-  const countYesPerKey = (data) => {
-    // Initialize a result object to store the count of "Yes" values for each key
-    const yesCount = {};
 
-    // Iterate over the list of objects
+  const countYesPerKey = (data) => {
+    const yesCount = {};
     data?.forEach((obj) => {
-      // For each object, iterate over the keys
       Object.keys(obj).forEach((key) => {
-        // If the value is "Yes", increment the count for that key
         if (obj[key] === "Yes") {
-          if (yesCount[key]) {
-            yesCount[key] += 1;
-          } else {
-            yesCount[key] = 1;
-          }
-        } else if (
-          (yesCount[key] === 0 && obj[key] === "No") ||
-          obj[key] === "-"
-        ) {
+          yesCount[key] = (yesCount[key] || 0) + 1;
+        } else if (!yesCount[key]) {
           yesCount[key] = 0;
         }
       });
     });
-
     setFailureCountObj(yesCount);
   };
 
   const checkFailureData = {
-    labels: [
-      "De-Duplication",
-      "PDF Edit",
-      "Copy Move",
-      "Metadata",
-      "QR Code",
-      "Image Edit",
-    ],
+    labels: ["De-Duplication", "PDF Edit", "Copy Move", "Metadata", "QR Code", "Image Edit"],
     datasets: [
       {
         label: "Failed Files",
@@ -87,69 +58,35 @@ const BarGraph = forwardRef(({ data }, ref) => {
   const checkFailureOptions = {
     responsive: true,
     plugins: {
-      legend: {
-        display: false,
-      },
-      tooltip: {
-        enabled: true,
-      },
+      legend: { display: false },
       datalabels: {
         display: true,
         color: "#fff",
         anchor: "center",
         align: "center",
-        font: {
-          weight: "bold",
-          size: 10,
-        },
+        font: { weight: "bold", size: 10 },
         formatter: (value) => value,
-      },
-      title: {
-        display: false,
-        text: "Check wise files failed",
-        align: "start",
-        color: "#000",
-        font: {
-          size: 12,
-          weight: "bold",
-        },
       },
     },
     scales: {
-      y: {
-        beginAtZero: true,
-        max: data?.length,
-        ticks: {
-          stepSize: 2,
-          precision: 0,
-          display: false,
-        },
-        grid: {
-          display: false,
-        },
-      },
+      y: { beginAtZero: true, ticks: { display: false }, grid: { display: false } },
       x: {
-        ticks: {
-          color: "#000",
-          font: {
-            size: 8,
-          },
-          autoSkip: false, // Show all labels
-          maxRotation: 0,
-          minRotation: 0,
-        },
-        grid: {
-          display: false,
-        },
+        ticks: { color: "#000", font: { size: 8 }, autoSkip: false },
+        grid: { display: false },
       },
     },
   };
+
+  // Expose chart instance
+  useImperativeHandle(ref, () => ({
+    getChart: () => chartRef.current,
+    toBase64Image: () => chartRef.current?.toBase64Image(),
+  }));
+
   return (
     <div className="bg-white rounded-md shadow-sm gap-2">
-      <h2 className="text-xs font-bold text-[#000] py-2 pl-2">
-        Check Wise Files Failed
-      </h2>
-      <Bar ref={ref} data={checkFailureData} options={checkFailureOptions} />
+      <h2 className="text-xs font-bold text-[#000] py-2 pl-2">Check Wise Files Failed</h2>
+      <Bar ref={chartRef} data={checkFailureData} options={checkFailureOptions} />
     </div>
   );
 });

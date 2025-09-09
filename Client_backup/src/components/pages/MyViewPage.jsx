@@ -130,23 +130,25 @@ const MyViewPage = () => {
   const handleDowload = async () => {
     const pieChartDataUrl = pieChartRef.current?.toBase64Image();
     const barChartDataUrl = barChartRef.current?.toBase64Image();
-
-    if (!pieChartDataUrl || !barChartDataUrl){
-      console.error('Charts not ready yet!');
+  
+    if (!pieChartDataUrl || !barChartDataUrl) {
+      console.error("Charts not ready yet!");
+      return;
     }
-    const blob = await pdf(<PdfTemplate responseData={responseData} userData={userData} processingTime={processingTime} pieChartDataUrl={pieChartDataUrl} barChartDataUrl={barChartDataUrl}/>).toBlob();
-
-    // Save the PDF file
+  
+    const blob = await pdf(
+      <PdfTemplate
+        responseData={responseData}
+        userData={userData}
+        processingTime={processingTime}
+        pieChartDataUrl={pieChartDataUrl}
+        barChartDataUrl={barChartDataUrl}
+      />
+    ).toBlob();
+  
     saveAs(blob, `report-${new Date().toISOString()}.pdf`);
-    // console.log("Handle download");
-    // return (
-    //   <div style={{ width: "100%", height: "100vh" }}>
-    //     <PDFViewer style={{ width: "100%", height: "100%" }}>
-    //       <PdfTemplate />
-    //     </PDFViewer>
-    //   </div>
-    // );
   };
+  
   return (
     <div className="bg-[#f3f3f3] min-h-screen w-full">
       <div className="grid grid-cols-1 lg:grid-cols-12 min-h-screen">
