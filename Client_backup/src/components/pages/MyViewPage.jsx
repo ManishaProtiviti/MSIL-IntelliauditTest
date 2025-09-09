@@ -153,7 +153,7 @@ const MyViewPage = () => {
     return null;
   };
 
-  const handleDowload = async () => {
+  const handleDownload = async () => {
     try {
       const pieChartDataUrl = await getChartDataUrl(pieChartRef, 10, 200);
       const barChartDataUrl = await getChartDataUrl(barChartRef, 10, 200);
