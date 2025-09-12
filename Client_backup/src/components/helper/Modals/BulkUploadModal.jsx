@@ -1,6 +1,6 @@
 import React, { useState, useRef } from "react";
 import axios from "axios";
-const api_url = import.meta.env.VITE_API_URL
+const api_url = import.meta.env.VITE_API_URL;
 const CheckItem = ({ check, onCheckChange }) => (
   <div className="flex items-center">
     <input
@@ -34,7 +34,7 @@ const BulkUploadModal = ({
   const [error, setError] = useState("");
   const timeoutRef = useRef(null); // Ref to store timeout ID
   const fileInputRef = useRef(null); // Ref to reset file input
-  const userData =  JSON.parse(sessionStorage.getItem("session"));
+  const userData = JSON.parse(sessionStorage.getItem("session"));
 
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
@@ -165,6 +165,7 @@ const BulkUploadModal = ({
           formData,
           {
             headers: { "Content-Type": "multipart/form-data" },
+            authorization: `Bearer ${userData.IdToken}`,
             timeout: 600000, // timeout
           }
         );
@@ -312,7 +313,8 @@ const BulkUploadModal = ({
       ) : (
         <div className="bg-white rounded-lg p-6 w-full max-w-md">
           <h2 className="text-md text-center font-semibold text-gray-800 mb-4 h-full">
-            Thanks for your request. The report will be emailed to you and is also available on the My View page.
+            Thanks for your request. The report will be emailed to you and is
+            also available on the My View page.
           </h2>
           <div className="flex justify-center gap-2">
             <button

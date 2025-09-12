@@ -25,7 +25,7 @@ const LandingPage = () => {
       setLoading(true);
       setStatus("Connecting to login service...");
 
-      const res = await axios.post(
+      /*const res = await axios.post(
         "https://apipreprod.developersinmarutisuzuki.in/loginviauserpass/v1/common/LoginViaUsernamePassword/partner/login-with-federation",
         {
           redirectUrl: REDIRECT_URI,
@@ -38,11 +38,17 @@ const LandingPage = () => {
           },
           timeout: 10000, // 10-second timeout
         }
+      ); */
+      const res = await axios.get(
+        `${api_url}/enterprise/auth/login-with-federation`,
+        {
+          headers: { "Content-Type": "application/json" },
+        }
       );
 
-      console.log("Login URL API response:", res.data);
+      if (res.status === 200) console.log("Login URL API response:", res.data);
 
-      const loginUrl = await res?.data?.data;
+      const loginUrl = await res?.data?.redirectUrl;
       if (loginUrl) {
         setStatus("Redirecting to ADFS...");
         window.location.href = loginUrl;
@@ -129,7 +135,11 @@ const LandingPage = () => {
             onClick={handleLaunch}
             disabled={loading}
             className={`mt-6 px-6 py-3 rounded-full flex justify-center items-center text-white transition 
-              ${loading ? "bg-gray-400 cursor-not-allowed" : "bg-[#012386] hover:bg-blue-800"}`}
+              ${
+                loading
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-[#012386] hover:bg-blue-800"
+              }`}
           >
             {loading ? "Please wait..." : "Launch"}
           </button>

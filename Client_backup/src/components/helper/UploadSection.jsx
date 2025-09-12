@@ -200,7 +200,10 @@ const UploadSection = forwardRef(
           `${api_url}/enterprise/upload-chunk`,
           formData,
           {
-            headers: { "Content-Type": "multipart/form-data" },
+            headers: {
+              "Content-Type": "multipart/form-data",
+              authorization: `Bearer ${userData.IdToken}`,
+            },
             onUploadProgress: (progressEvent) => {
               const uploadedBytes = index * CHUNK_SIZE + progressEvent.loaded;
               const totalBytes = file.size;
@@ -429,6 +432,7 @@ const UploadSection = forwardRef(
           payload,
           {
             headers: { "Content-Type": "application/json" },
+            authorization: `Bearer ${userData.IdToken}`,
           }
         );
         console.log("Bulk process response:", response.data);
@@ -546,8 +550,8 @@ const UploadSection = forwardRef(
             }
           }}
           message={message}
-          title= "Upload Status"
-          buttonName= "Close"
+          title="Upload Status"
+          buttonName="Close"
         />
       </section>
     );

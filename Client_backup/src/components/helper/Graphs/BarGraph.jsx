@@ -44,6 +44,7 @@ const BarGraph = forwardRef(({ data }, ref) => {
         backgroundColor: "#012378",
         borderRadius: 4,
         barThickness: 30,
+
       },
     ],
   };
@@ -51,12 +52,61 @@ const BarGraph = forwardRef(({ data }, ref) => {
   const checkFailureOptions = {
     responsive: true,
     plugins: {
-      legend: { display: false },
-      datalabels: { display: true, anchor: "center", align: "center", color: "#fff", font: { weight: "bold", size: 10 } },
+      legend: {
+        display: false,
+      },
+      tooltip: {
+        enabled: true,
+      },
+      datalabels: {
+        display: true,
+        color: "#fff",
+        anchor: "center",
+        align: "center",
+        font: {
+          weight: "bold",
+          size: 10,
+        },
+        formatter: (value) => value,
+      },
+      title: {
+        display: false,
+        text: "Check wise files failed",
+        align: "start",
+        color: "#000",
+        font: {
+          size: 12,
+          weight: "bold",
+        },
+      },
     },
     scales: {
-      y: { beginAtZero: true, ticks: { display: false }, grid: { display: false } },
-      x: { ticks: { autoSkip: false, maxRotation: 0, minRotation: 0 }, grid: { display: false } },
+      y: {
+        beginAtZero: true,
+        max: data?.length,
+        ticks: {
+          stepSize: 2,
+          precision: 0,
+          display: false,
+        },
+        grid: {
+          display: false,
+        },
+      },
+      x: {
+        ticks: {
+          color: "#000",
+          font: {
+            size: 8,
+          },
+          autoSkip: false, // Show all labels
+          maxRotation: 0,
+          minRotation: 0,
+        },
+        grid: {
+          display: false,
+        },
+      },
     },
   };
 
@@ -72,7 +122,7 @@ const BarGraph = forwardRef(({ data }, ref) => {
   }));
 
   return (
-    <div className="bg-white rounded-md shadow-sm gap-2">
+    <div className="bg-white rounded-md shadow-sm gap-2 w-full">
       <h2 className="text-xs font-bold text-[#000] py-2 pl-2">Check Wise Files Failed</h2>
       <Bar ref={chartRef} data={checkFailureData} options={checkFailureOptions} />
     </div>

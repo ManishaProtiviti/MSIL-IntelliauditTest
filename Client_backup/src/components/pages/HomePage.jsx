@@ -41,6 +41,8 @@ const HomePage = () => {
   console.log("Upload Values", uploadValues);
   const uploadSectionRef = useRef(null);
   const navigate = useNavigate();
+
+  const sessionData = JSON.parse(sessionStorage.getItem("session"));
   const { userData: user } = useAuth(); // CORRECT
 
   console.log("Auth user:", user);
@@ -49,7 +51,6 @@ const HomePage = () => {
       navigate("/"); // not authenticated
     }
   }, [user]);
-  
 
   // const fetchTokenAndUser = async (code) => {
   //   try {
@@ -178,7 +179,10 @@ const HomePage = () => {
         axios.defaults.timeout = 600000;
         await axios.post(`${api_url}/enterprise/process`, checksPayload, {
           timeout: 600000,
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            authorization: `Bearer ${sessionData.IdToken}`,
+          },
         });
 
         setProcessMessage(

@@ -60,7 +60,8 @@ const MyViewPage = () => {
       const response = await axios.get(
         `${VITE_API_URL}/enterprise/request/status/${sessionId}/${userData?.employeeId}/${uploadTimeStamp}/details`,
         {
-          headers: { "Content-Type": "application/json" },
+          headers: { "Content-Type": "application/json", authorization: `Bearer ${userData.IdToken}` },
+          
         }
       );
 
@@ -89,7 +90,8 @@ const MyViewPage = () => {
       const response = await axios.get(
         `${VITE_API_URL}/enterprise/request/status/${userData?.sessionId}/${userData?.employeeId}/${selectedUploadTime}/${checkType}/${data?.Document_Name}/files`,
         {
-          headers: { "Content-Type": "application/json" },
+          headers: { "Content-Type": "application/json", authorization: `Bearer ${userData.IdToken}` },
+          
         }
       );
 
@@ -107,7 +109,8 @@ const MyViewPage = () => {
       const response = await axios.get(
         `${VITE_API_URL}/enterprise/request/${userData?.sessionId}/${userData?.employeeId}/reports`,
         {
-          headers: { "Content-Type": "application/json" },
+          headers: { "Content-Type": "application/json", authorization: `Bearer ${userData.IdToken}` },
+          
         }
       );
 
@@ -134,13 +137,21 @@ const MyViewPage = () => {
       try {
         // 1) try the exposed toBase64Image()
         const maybe = chartRef.current?.toBase64Image?.();
-        if (maybe && typeof maybe === "string" && maybe.startsWith("data:image/")) {
+        if (
+          maybe &&
+          typeof maybe === "string" &&
+          maybe.startsWith("data:image/")
+        ) {
           return maybe;
         }
 
         // 2) try Chart.js instance's canvas
-        const chartInstance = chartRef.current?.getChartInstance?.() || chartRef.current;
-        const canvas = chartInstance?.canvas || chartInstance?.ctx?.canvas || chartRef.current?.canvas;
+        const chartInstance =
+          chartRef.current?.getChartInstance?.() || chartRef.current;
+        const canvas =
+          chartInstance?.canvas ||
+          chartInstance?.ctx?.canvas ||
+          chartRef.current?.canvas;
         if (canvas && typeof canvas.toDataURL === "function") {
           const url = canvas.toDataURL("image/png");
           if (url && url.startsWith("data:image/")) return url;
@@ -161,7 +172,9 @@ const MyViewPage = () => {
 
       if (!pieChartDataUrl || !barChartDataUrl) {
         // generate PDF but without charts (safe fallback)
-        console.warn("Could not capture charts in time — generating PDF without charts.");
+        console.warn(
+          "Could not capture charts in time — generating PDF without charts."
+        );
       }
 
       // IMPORTANT: pass the data URLs directly (react-pdf expects 'data:image/...' string)
@@ -182,6 +195,15 @@ const MyViewPage = () => {
     }
   };
   const handlePreview = async () => {
+    const pieChartDataUrl = await getChartDataUrl(pieChartRef, 10, 200);
+    const barChartDataUrl = await getChartDataUrl(barChartRef, 10, 200);
+
+    if (!pieChartDataUrl || !barChartDataUrl) {
+      // generate PDF but without charts (safe fallback)
+      console.warn(
+        "Could not capture charts in time — generating PDF without charts."
+      );
+    }
     const blob = await pdf(
       <PdfTemplate
         responseData={responseData}
@@ -195,7 +217,6 @@ const MyViewPage = () => {
     const url = URL.createObjectURL(blob);
     setPdfUrl(url);
   };
-
 
   return (
     <div className="bg-[#f3f3f3] min-h-screen w-full">
@@ -287,10 +308,10 @@ const MyViewPage = () => {
                   <div className="text-xs font-medium bg-[#012378] text-white px-2 py-1 rounded">
                     {responseData?.status_data?.length
                       ? `${(
-                        parseFloat(
-                          responseData?.status_data[0]?.Total_Size_Upload
-                        ) || 0
-                      ).toFixed(2)} MB`
+                          parseFloat(
+                            responseData?.status_data[0]?.Total_Size_Upload
+                          ) || 0
+                        ).toFixed(2)} MB`
                       : "0.00 MB"}
                   </div>
                 </div>
@@ -308,10 +329,15 @@ const MyViewPage = () => {
                 docData={docData}
                 handleDownload={handleDownload}
               />
-              <button onClick={handlePreview}>Preview PDF</button>
+              {/* <button onClick={handlePreview}>Preview PDF</button>
               {pdfUrl && (
-                <iframe src={pdfUrl} width="100%" height="600px" title="PDF Preview" />
-              )}
+                <iframe
+                  src={pdfUrl}
+                  width="100%"
+                  height="600px"
+                  title="PDF Preview"
+                />
+              )} */}
             </div>
           </div>
 

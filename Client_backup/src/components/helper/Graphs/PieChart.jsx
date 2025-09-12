@@ -31,21 +31,61 @@ const PieChart = forwardRef(({ data }, ref) => {
     ],
   };
 
-  const pieOptions = {
+ const pieOptions = {
     maintainAspectRatio: false,
     responsive: true,
     plugins: {
-      legend: { display: true, position: "right" },
+      legend: {
+        display: true,
+        position: "right",
+        labels: {
+          usePointStyle: true, // ✅ makes legend marker circular
+          pointStyle: "circle", // ✅ circle instead of square
+          boxWidth: 10,
+          padding: 12,
+          font: {
+            family: "'Roboto', sans-serif",
+            size: 11,
+            weight: "bold",
+          },
+          color: "#000",
+        },
+      },
       datalabels: {
         formatter: (value, context) => {
-          const total = context.chart.data.datasets[0].data.reduce((s, v) => s + v, 0);
-          const pct = total ? Math.round((value / total) * 100) : 0;
-          return `${value} (${pct}%)`;
+          const total = context.chart.data.datasets[0].data.reduce(
+            (sum, val) => sum + val,
+            0
+          );
+          const percentage = ((value / total) * 100).toFixed(0);
+          const label = context.chart.data.labels[context.dataIndex];
+          return value === 1 ? `${label}: ${value} file (${percentage}%)`: `${label}: ${value} files (${percentage}%)`;
         },
         color: "#fff",
-        font: { weight: "bold", size: 10 },
+        font: {
+          weight: "bold",
+          size: 10,
+          family: "'Inter', sans-serif",
+        },
       },
-      title: { display: true, text: "Pass / Fail Split", align: "start" },
+      title: {
+        display: false,
+        text: "Pass / Fail Split",
+        align: "start",
+        color: "#000",
+        font: {
+          size: 12,
+          weight: "bold",
+        },
+      },
+      tooltip: {
+        backgroundColor: "#333",
+        titleColor: "#fff",
+        bodyColor: "#fff",
+        borderColor: "#ccc",
+        borderWidth: 1,
+        padding: 8,
+      },
     },
   };
 
@@ -64,10 +104,11 @@ const PieChart = forwardRef(({ data }, ref) => {
   }));
 
   return (
-    <div className="bg-white rounded-xl shadow-md w-full">
-      <div className="w-full h-64 p-2">
+    <div className="bg-white rounded-xl shadow-md gap-2 ">
+      <h2 className="text-xs font-bold text-[#000] py-2 pl-2">Pass / Fail Split</h2>
+      <div className="w-full h-48 p-2">
         <Pie ref={chartRef} data={pieData} options={pieOptions} />
-      </div>
+      </div>  
     </div>
   );
 });

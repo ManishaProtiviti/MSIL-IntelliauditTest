@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useEffect, useState, useRef } from "react";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useRef,
+} from "react";
 import { createSession, getSession, clearSession } from "../utils/session";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
@@ -11,7 +17,6 @@ const CLIENT_ID = "3s2ompa7a888fvl94kvm581vvj";
 //const CLIENT_ID = "5miscbmfvmhp49mmdlekvumsst";
 // const REDIRECT_URI = `${api_url}/home`;
 const REDIRECT_URI = "https://devintelliaudit.maruti-suzuki.ai/home";
-
 
 export const AuthProvider = ({ children }) => {
   const [userData, setUserData] = useState(undefined); // initially undefined
@@ -83,25 +88,24 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const fetchTokenAndUser = async (code) => {
-    console.log("↪️ Fetching token with code:", code, "at", new Date().toISOString());
+    console.log(
+      "↪️ Fetching token with code:",
+      code,
+      "at",
+      new Date().toISOString()
+    );
     let retryCount = 0;
-    const maxRetries = 1; // Limit to one retry
+    const maxRetries = 0; // Limit to one retry
 
     while (retryCount <= maxRetries) {
       try {
-        const res = await axios.post(
-          "https://apipreprod.developersinmarutisuzuki.in/loginviauserpass/v1/common/LoginViaUsernamePassword/partner/get-token",
-          {
-            redirectUrl: REDIRECT_URI,
-            code,
-            clientId: CLIENT_ID,
-          },
+        const res = await axios.get(
+          `${api_url}/enterprise/auth/user-details/${code}`,
           {
             headers: {
               "Content-Type": "application/json",
-              "x-api-key": API_KEY,
             },
-            timeout: 15000,
+            timeout: 25000, // 10-second timeout
           }
         );
 
@@ -154,6 +158,8 @@ export const AuthProvider = ({ children }) => {
         const employeeId = decoded?.identities?.[0]?.userId || "UNKNOWN_ID";
 
         const sessionData = {
+          IdToken: token,
+          RefreshToken: res.data?.data?.RefreshToken,
           employeeId,
           employeeName: decoded.name || "Unknown",
           employeeEmailId: decoded.email,
@@ -185,14 +191,31 @@ export const AuthProvider = ({ children }) => {
           {
             headers: {
               "Content-Type": "application/json",
+              authorization: `Bearer ${sessionData.IdToken}`,
             },
           }
         );
 
+        /*const refreshtokenRes = await axios.post(
+          `${api_url}/enterprise/auth/refresh-token`,
+          {
+            refreshToken: sessionData.RefreshToken
+          },
+          {
+            headers: {
+              "Content-Type": "application/json",
+              "authorization": `Bearer ${sessionData.IdToken}`
+            },
+          }
+        );
+        console.log('refreshtokenRes', refreshtokenRes)*/
         console.log("Login details posted to API");
         return; // Success, exit loop
       } catch (error) {
-        console.error(`Authentication failed (attempt ${retryCount + 1}):`, error.response?.data || error.message);
+        console.error(
+          `Authentication failed (attempt ${retryCount + 1}):`,
+          error.response?.data || error.message
+        );
         retryCount++;
         if (retryCount > maxRetries) {
           clearSession();
