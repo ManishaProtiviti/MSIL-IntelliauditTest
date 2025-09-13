@@ -189,6 +189,55 @@ const MyViewPage = () => {
       ).toBlob();
 
       saveAs(blob, `report-${new Date().toISOString()}.pdf`);
+
+      const headerRows = [
+        ["Name", userData?.name || ""],
+        ["User ID", userData?.employeeId || ""],
+        ["Mail ID", userData?.email || ""],
+        ["Department", userData?.department || ""],
+        ["Access Type", userData?.accessType || ""],
+        [],
+      ];
+  
+      // Table Header
+      const tableHeader = [
+        [
+          "File Name",
+          "Checks Failed",
+          "De-Duplication",
+          "PDF Edit",
+          "Copy Move",
+          "Metadata",
+          "QR Code",
+          "Image Edit",
+        ],
+      ];
+  
+      // Table Data
+      const tableRows =
+        responseData?.transactions?.map((row) => [
+          row?.Document_Name,
+          Object.values(row)?.filter((v) => v === "Yes").length +
+            "/" +
+            Object.values(row)?.filter((v) => v === "Yes" || v === "No").length,
+          row?.Duplicate_Exception_Flag || "",
+          row?.PDF_Edit_Exception_Flag || "",
+          row?.Copy_Move_Exception_Flag || "",
+          row?.MetaData_Exception_Flag || "",
+          row?.QR_Code_Exception_Flag || "",
+          row?.Image_Edit_Exception_Flag || "",
+        ]) || [];
+  
+      // Combine all
+      const wsData = [...headerRows, ...tableHeader, ...tableRows];
+  
+      // Create worksheet and workbook
+      const ws = XLSX.utils.aoa_to_sheet(wsData);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Report");
+  
+      // Save Excel
+      XLSX.writeFile(wb, `report-${new Date().toISOString()}.xlsx`);
     } catch (err) {
       console.error("PDF generation failed:", err);
       alert("PDF generation failed. Check console for details.");
